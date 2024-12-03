@@ -1033,7 +1033,7 @@ document.getElementById("safetypagebtn").addEventListener('click', function safe
 
 	document.getElementById('appbody').style.top = `-${window.scrollY}px`;
 	document.getElementById('appbody').style.position = 'fixed';
-	destroyFullscreen();
+    destroyFullscreen();
 	const buttons = document.querySelectorAll('.menubutton');
 	buttons.forEach(button => { button.classList.remove("menuitemactive"); });
 	document.getElementById("safetypagebtn").classList.add("menuitemactive");
