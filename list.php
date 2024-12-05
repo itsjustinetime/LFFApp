@@ -330,10 +330,11 @@ async function getData() {
 	bars = bars.sort(dynamicSort(['venuepriority','venuerecommended']));
 	beers = beers.sort(dynamicSort(['venuepriority','venuerecommended']));
 	coffees = coffees.sort(dynamicSort(['venuepriority','venuerecommended']));
+	hotels = hotels.sort(dynamicSort(['venuepriority','venuerecommended']));
 	restaurants = restaurants.sort(dynamicSort(['venuepriority','venuerecommended']));
 	carparks = carparks.sort(dynamicSort(['venuepriority','venurecommended']));
+	featured = featured.sort(dynamicSort(['venuepriority','venurecommended']));
 	places = bars.concat(beers).concat(coffees).concat(restaurants).concat(hotels).concat(stores).concat(carparks).concat(featured);
-	//places=places.sort(dynamicSort(['venuecategory','venuerecommended']));
 	
 	listing=events;
 	updateEvents();
@@ -761,9 +762,10 @@ function updatePlaces() {
 		// omit venue pass. Because of Fibre QR codes grrr
 			if ((offers[off]['highlightvenue'] == place.venuename) && (offers[off]['highlightcategory'] != 'venuepass') ) {    
 			offerString='<div class="placeoffer"><div class="fsoffertitle">'+	offers[off]['highlighttitle'] 
-				+'</div><div class="fsoffersubtitle">' +	offers[off]['highlightsubtitle'] +'</div>'+'<div class="fsofferdesc">'+
-				offers[off]['highlightdesc'] +'</div>';
-				if ( offers[off]['highlightinfotext'] ) { 
+				+'</div><div class="fsoffersubtitle">' +	offers[off]['highlightsubtitle'] +'</div>';
+				if (offers[off]['highlightdesc']) { offerString=offerString+'<div class="fsofferdesc">'+
+				offers[off]['highlightdesc'] +'</div>'; }
+				if ( offers[off]['highlightoffercode'] ) { 
 					offerString=offerString+'<div class="fsoffercode">Code: ' + offers[off]['highlightinfotext'] + '</div>';
 				}
 				offerString=offerString+"</div>";
