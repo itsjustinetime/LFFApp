@@ -306,13 +306,35 @@ async function getData() {
 	offers=jsonData.highlights;
 	places=jsonData.places;
 	services=jsonData.services;
-	//const sortedData = data.sort(dynamicSort(['name', 'age']));
-	places=places.sort(dynamicSort(['venuecategory','venuepriority']));
+
+	// Let's sort the venues ... the hard way
+	var bars = [];
+	var beers = [];
+	var hotels = [];
+	var carparks = [];
+	var restaurants = [];
+	var stores = [];
+	var coffees = [];
+	var featured = [];
 	
-	//let responseE = await fetch('getevents.php');
-	//let responseE = await fetch('events.json'+'?nocache='+new Date().getTime());
-	//responseE = await responseE.text();
-	//listing = JSON.parse(responseE);
+	places.forEach(function (item) {
+		if (item['venuecategory']=="Bars") { bars.push(item); }
+		if (item['venuecategory']=="Beer Houses") { beers.push(item); }
+		if (item['venuecategory']=="Hotels") { hotels.push(item); }
+		if (item['venuecategory']=="Restaurants") { restaurants.push(item); }
+		if (item['venuecategory']=="Car Parks") { carparks.push(item); }
+		if (item['venuecategory']=="Coffee Shops") { coffees.push(item); }
+		if (item['venuecategory']=="Stores") { stores.push(item); }
+		if (item['venuecategory']=="Featured") { featured.push(item); }
+	});
+	bars = bars.sort(dynamicSort(['venuepriority','venuerecommended']));
+	beers = beers.sort(dynamicSort(['venuepriority','venuerecommended']));
+	coffees = coffees.sort(dynamicSort(['venuepriority','venuerecommended']));
+	restaurants = restaurants.sort(dynamicSort(['venuepriority','venuerecommended']));
+	carparks = carparks.sort(dynamicSort(['venuepriority','venurecommended']));
+	places = bars.concat(beers).concat(coffees).concat(restaurants).concat(hotels).concat(stores).concat(carparks).concat(featured);
+	//places=places.sort(dynamicSort(['venuecategory','venuerecommended']));
+	
 	listing=events;
 	updateEvents();
 	updateHighlights();
@@ -631,7 +653,7 @@ function updateEvents() {
 		eventEndTime=getSeconds(eventEndTime);
 		
 		//if (eventEndTime < curDate ) { continue; }  // FIX THIS!!
-		if ((thisDate != lastDate) && lastDate !=0) { page1HTML=page1HTML+ '</div><div class="eventdivider"></div>';}
+		if ((thisDate != lastDate) && lastDate !=0) { page1HTML=page1HTML+ '</div>';}
 		if ((thisDate != lastDate) && isFirstFriday(thisDate) ) {
 			page1HTML=page1HTML+'<div class="eventdate" id="id'+thisDate+'"><div class="eventdatetext">LFF '+months[thisMonth]+" - "+niceDate(thisDate,1,1)+'</div>';
 		} else
@@ -675,7 +697,6 @@ function updateEvents() {
 			curTemplate=curTemplate.replace('class="collapse"', 'style="display:none;"');
 			//curTemplate=curTemplate.replace('class="tap4more"', 'style="display:none;"');
 		}
-
 		lastDate = thisDate;
 		page1HTML=page1HTML+curTemplate;
 		document.getElementById("page1").innerHTML=page1HTML;
@@ -773,6 +794,7 @@ function updatePlaces() {
 				}
 		
 		curTemplate=replaceMe(curTemplate,data);
+		if (place.venuewebsite) { curTemplate = curTemplate.replace('vweb" style="display:none;"','vweb" style="display:block;"'); }
 		if (place.venuefacebook) { curTemplate = curTemplate.replace('vfb" style="display:none;"','vfb" style="display:block;"'); }
 		if (place.venueinstagram) { curTemplate = curTemplate.replace('vig" style="display:none;"','vig" style="display:block;"'); }
 		page3HTML=page3HTML+curTemplate;
