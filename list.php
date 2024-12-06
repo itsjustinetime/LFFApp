@@ -3,7 +3,7 @@ include_once 'configuration.php';
 //error_log( "path:".$PATH_CONTENT);
 
 include_once 'logging.php';
-//include_once '../appadmin/adminfuncs.php';
+
 $passcodepath = '';
 //$datapath='lffdata.json';
 
@@ -297,7 +297,7 @@ function dynamicSort(properties) {
     }
 }
 async function getData() {
-	var response = await fetch('lffeventdata.json'); //+'?nocache='+new Date().getTime());
+	var response = await fetch('<?php echo $PATH_CONTENT.'/lff-events/json/lffeventdata.json'; ?>'); //+'?nocache='+new Date().getTime());
 	response = await response.text();
     const jsonData = JSON.parse(response);
 	events=jsonData.events;
