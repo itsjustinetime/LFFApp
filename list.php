@@ -111,6 +111,22 @@ if (isset($_COOKIE['lffID'])) {
 <?php include_once("templates/categories.php"); ?>
 <script>
 
+function shuffle(array) {
+  let currentIndex = array.length;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+}
+
 function lastSunday(month, year) {
   var d = new Date();
   var lastDayOfMonth = new Date(Date.UTC(year || d.getFullYear(), month+1, 0));
@@ -127,7 +143,7 @@ function isBST(date) {
   return d.getTime() >= starts.getTime() && d.getTime() < ends.getTime();
 }
 var faClock='<i class="fa-regular fa-clock"></i> ';
-var imagePath='../bl-content/lff-events/images/';
+var imagePath='<?php echo $PATH_CONTENT; ?>/lff-events/images/';
 var eventhtml="";
 var theDate=new Date();
 var hours=theDate.getHours();
@@ -145,6 +161,9 @@ var services;
 var curDate;
 var listing;
 var safety;
+var bars;
+var coffees;
+
 var baseDir='/'+window.location.pathname.split("/");
 var testMode=0;
 var debugmode=0;
@@ -286,6 +305,14 @@ function getSeconds(datetime) {
 	return seconds;
 }
 
+function sortRecommended(array) {
+
+	for (let v = 0; i < array.length; v++) {
+		
+	}
+	
+}
+
 function dynamicSort(properties) {
     return function(a, b) {
         for (let i = 0; i < properties.length; i++) {
@@ -296,6 +323,7 @@ function dynamicSort(properties) {
         return 0;
     }
 }
+
 async function getData() {
 	var response = await fetch('<?php echo $PATH_CONTENT.'/lff-events/json/lffeventdata.json'; ?>'); //+'?nocache='+new Date().getTime());
 	response = await response.text();
@@ -308,16 +336,17 @@ async function getData() {
 	services=jsonData.services;
 
 	// Let's sort the venues ... the hard way
-	var bars = [];
+	bars = [];
 	var beers = [];
 	var hotels = [];
 	var carparks = [];
 	var restaurants = [];
 	var stores = [];
-	var coffees = [];
+	coffees = [];
 	var featured = [];
 	
 	places.forEach(function (item) {
+		if (item['venuerecommended'] !="on") { item['venuerecommended']="z"; }
 		if (item['venuecategory']=="Bars") { bars.push(item); }
 		if (item['venuecategory']=="Beer Houses") { beers.push(item); }
 		if (item['venuecategory']=="Hotels") { hotels.push(item); }
@@ -329,7 +358,7 @@ async function getData() {
 	});
 	bars = bars.sort(dynamicSort(['venuepriority','venuerecommended']));
 	beers = beers.sort(dynamicSort(['venuepriority','venuerecommended']));
-	coffees = coffees.sort(dynamicSort(['venuepriority','venuerecommended']));
+	coffees = coffees.sort(dynamicSort(['venuerecommended','venuepriority']));
 	hotels = hotels.sort(dynamicSort(['venuepriority','venuerecommended']));
 	restaurants = restaurants.sort(dynamicSort(['venuepriority','venuerecommended']));
 	carparks = carparks.sort(dynamicSort(['venuepriority','venurecommended']));
@@ -644,6 +673,7 @@ function updateEvents() {
 		const event=events[i];
 		var curTemplate=eventTemplate;
 		event.eventstart=event.eventstart.replace("T"," ");
+		if ( event.eventend < dateTime) { continue; }
 		var thisDate=event.eventstart.split(" ")[0];
 		var thisTime=event.eventstart.split(" ")[1];
 		var thisMonth = new Date (thisDate).getMonth();
@@ -766,7 +796,7 @@ function updatePlaces() {
 				if (offers[off]['highlightdesc']) { offerString=offerString+'<div class="fsofferdesc">'+
 				offers[off]['highlightdesc'] +'</div>'; }
 				if ( offers[off]['highlightoffercode'] ) { 
-					offerString=offerString+'<div class="fsoffercode">Code: ' + offers[off]['highlightinfotext'] + '</div>';
+					offerString=offerString+'<div class="fsoffercode">Code: ' + offers[off]['highlightoffercode'] + '</div>';
 				}
 				offerString=offerString+"</div>";
 			}
@@ -812,6 +842,7 @@ function updateServices() {
 	var lastType=0;
 	var type=0;
 	var serviceType;
+	shuffle(services); // shuffle services around - IMPORTANT this is only cool while there's only one kind of service!
 	for (var i=0; i < services.length; i++) {
 		var service=services[i];
 		var curTemplate=servicesTemplate;
