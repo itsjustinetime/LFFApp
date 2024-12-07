@@ -722,6 +722,7 @@ function updateEvents() {
 	    if (event.eventfull == 'on' && getSeconds(event.eventstart)-curDate<60*60*24*30) {		
 			curTemplate=curTemplate.replace('evfull" style="display:none;"','evfull"'); 
 			}
+		if (event.eventctatext) {curTemplate=curTemplate.replace('cta{venuetag}" style="display:none;"','cta{venuetag}"'); }
 		curTemplate=replaceMe(curTemplate,data);
 		//if (isDayTime(event.eventstart)) {   curTemplate=curTemplate.replace('class="eventcontainer eventexpand"','class="eventcontainer eventexpand eventdaytime"'); }
 		if (data['eventrecur']=='on' && data['eventdescription']=='') { 
