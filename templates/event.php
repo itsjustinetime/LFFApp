@@ -20,16 +20,18 @@
 	<div class="collapse" id="coll_{venuetag}">
 		<div class="collapsecontainer">
 			<div class="infodesc">{eventdescription}</div>
-			<div id="cta{venuetag}" class=""><a class="socialbutton" href="{eventctaurl}"><i class="fa-brands fa-facebook-messenger"></i>   {eventctatext}</a></div>
+			<div id="cta{venuetag}" style="display:none;"><a class="socialbutton" href="{eventctaurl}"><i class="fa-brands fa-facebook-messenger"></i>   {eventctatext}</a></div>
 			<div class="mapbutton">
 				<a id="maplink" href='https://maps.google.com/?q={venuecoords}'>
-					<div class="fsaddress">{venueaddress}<i class="fa-solid fa-location-dot"></i></div>
+					<div class="fsaddress white">{venueaddress}<i class="fsdot fa-solid fa-location-dot"></i></div>
 				</a>
 			</div>
 		</div>
 	</div> 
 </div>
 <div class="eventdivider"></div>
+
+
 
 		
 

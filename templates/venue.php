@@ -19,10 +19,11 @@
 			<div class="venuesociallinks">
 			<a class="slink" href="{venuefacebook}" name="vfb" style="display:none;" id="vfacebook{venuetag}"><i class="fa-brands fa-facebook"></i></a>
 			<a class="slink" href="{venueinstagram}" name="vig" style="display:none;" id="vinstagram{venuetag}"><i class="fa-brands fa-instagram"></i></a>
+			<a class="slink" href="{venuewebsite}" name="vweb" style="display:none;" id="vwebsite{venuetag}"><i class="fa-solid fa-link"></i></a>
 			</div>
 			<div class="mapbutton">
 					<a id="maplink" href='https://maps.google.com/?q={venuecoords}'>
-						<div class="fsaddress white">{venueaddress}<i class="fa-solid fa-location-dot white"></i></div>
+						<div class="fsaddress white">{venueaddress}<i class="fsdot fa-solid fa-location-dot white"></i></div>
 					</a>
 			</div>
 			

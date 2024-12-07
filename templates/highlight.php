@@ -20,7 +20,7 @@
 			<div class="fsoffercode white">CODE: {highlightoffercode}</div>
 			<div class="mapbutton">
 				<a id="maplink" href='https://maps.google.com/?q={venuecoords}'>
-					<div class="fsaddress">{venueaddress}<i class="fa-solid fa-location-dot"></i></div>
+					<div class="fsaddress white">{venueaddress}<i class="fsdot fa-solid fa-location-dot"></i></div>
 				</a>
 			</div>
 		</div>
