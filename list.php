@@ -108,7 +108,20 @@ if (isset($_COOKIE['lffID'])) {
 <div id="highlighttemp" style="display:none;"><?php include_once("templates/highlight.php"); ?></div>
 <div id="placestemp" style="display:none;"><?php include_once("templates/venue.php"); ?></div>
 <div id="servicestemp" style="display:none;"><?php include_once("templates/services.php"); ?></div>
-<?php include_once("templates/categories.php"); ?>
+<div id="venuecategories" style="display:none;"><?php 
+DEFINE('BLUDIT', true);
+$settingsFile = file_get_contents($PATH_CONTENT.'databases/plugins/LFFEvents/db.php');
+$settingsFile = explode('>',$settingsFile)[1];
+$lffSettings = json_decode($settingsFile,true);
+$venuecats = $lffSettings['venuecategories'];
+echo $venuecats;
+?>
+</div>
+<div id="servicecategories" style="display:none;"><?php echo $lffSettings['servicecategories']; ?>
+</div>
+<div id="highlightcategories" style="display:none;"><?php echo $lffSettings['highlightcategories']; ?>
+</div>
+
 <script>
 
 function shuffle(array) {
@@ -142,6 +155,7 @@ function isBST(date) {
   ends.setHours(1);
   return d.getTime() >= starts.getTime() && d.getTime() < ends.getTime();
 }
+
 var faClock='<i class="fa-regular fa-clock"></i> ';
 var imagePath='<?php echo $PATH_CONTENT; ?>/lff-events/images/';
 var eventhtml="";
@@ -163,6 +177,9 @@ var listing;
 var safety;
 var bars;
 var coffees;
+
+var venuecategories;
+var highlightcategories;
 
 var baseDir='/'+window.location.pathname.split("/");
 var testMode=0;
@@ -305,14 +322,6 @@ function getSeconds(datetime) {
 	return seconds;
 }
 
-function sortRecommended(array) {
-
-	for (let v = 0; i < array.length; v++) {
-		
-	}
-	
-}
-
 function dynamicSort(properties) {
     return function(a, b) {
         for (let i = 0; i < properties.length; i++) {
@@ -329,7 +338,6 @@ async function getData() {
 	response = await response.text();
     const jsonData = JSON.parse(response);
 	events=jsonData.events;
-	//events=events.sort(dynamicSort(['eventstart','eventpriority']));
 	
 	offers=jsonData.highlights;
 	places=jsonData.places;
@@ -345,6 +353,10 @@ async function getData() {
 	coffees = [];
 	var featured = [];
 	
+	venuecategories = document.getElementById('venuecategories').innerHTML.split(",");
+	servicecategories = document.getElementById('servicecategories').innerHTML.split(",");
+	highlightcategories = document.getElementById('highlightcategories').innerHTML.split(",");
+	
 	places.forEach(function (item) {
 		if (item['venuerecommended'] !="on") { item['venuerecommended']="z"; }
 		if (item['venuecategory']=="Bars") { bars.push(item); }
@@ -356,13 +368,13 @@ async function getData() {
 		if (item['venuecategory']=="Stores") { stores.push(item); }
 		if (item['venuecategory']=="Featured") { featured.push(item); }
 	});
-	bars = bars.sort(dynamicSort(['venuepriority','venuerecommended']));
-	beers = beers.sort(dynamicSort(['venuepriority','venuerecommended']));
+	bars = bars.sort(dynamicSort(['venuerecommended','venuepriority']));
+	beers = beers.sort(dynamicSort(['venuerecommended','venuepriority']));
 	coffees = coffees.sort(dynamicSort(['venuerecommended','venuepriority']));
-	hotels = hotels.sort(dynamicSort(['venuepriority','venuerecommended']));
-	restaurants = restaurants.sort(dynamicSort(['venuepriority','venuerecommended']));
-	carparks = carparks.sort(dynamicSort(['venuepriority','venurecommended']));
-	featured = featured.sort(dynamicSort(['venuepriority','venurecommended']));
+	hotels = hotels.sort(dynamicSort(['venuerecommended','venuepriority']));
+	restaurants = restaurants.sort(dynamicSort(['venuerecommended','venuepriority']));
+	carparks = carparks.sort(dynamicSort(['venuerecommended','venuepriority']));
+	featured = featured.sort(dynamicSort(['venuerecommended','venuepriority']));
 	places = bars.concat(beers).concat(coffees).concat(restaurants).concat(hotels).concat(stores).concat(carparks).concat(featured);
 	
 	listing=events;
@@ -372,7 +384,6 @@ async function getData() {
 	updateServices();
 	updateEventList();
 	updateHashtag();
-	addMapListener();
 }
 
 function replaceMe(template, data) {
@@ -803,9 +814,17 @@ function updatePlaces() {
 			}
 		}	
 		if (placeType != lastType){
-
+			iconType='';
 			if (lastType!='') { page3HTML=page3HTML+'<div class="placespacer"></div></div>'; }
-			page3HTML=page3HTML+'<div class="placetype">'+placeType+'</div><div class="placesdivider">'; 
+			page3HTML=page3HTML+'<div class="placetype">'+placeType;
+			if (placeType=='Bars') iconType='<i class="fa-solid fa-martini-glass"></i>';
+			if (placeType=='Beer Houses') iconType='<i class="fa-solid fa-beer-mug-empty"></i>';
+			if (placeType=='Hotels') iconType='<i class="fa-solid fa-bed"></i>';
+			if (placeType=='Coffee Shops') iconType='<i class="fa-solid fa-mug-hot"></i>';
+			if (placeType=='Restaurants') iconType='<i class="fa-solid fa-utensils"></i>';
+			if (placeType=='Car Parks') iconType='<i class="fa-solid fa-car"></i>';
+			if (placeType=='Featured') iconType='<i class="fa-solid fa-award"></i>';
+			page3HTML=page3HTML+iconType+'</div><div class="placesdivider">'; 
 		}
 		var venuerecShow="none";
 		if (place.venuerecommended=="on") { venuerecShow="block";}
@@ -852,7 +871,11 @@ function updateServices() {
 		if (serviceType != lastType){
 			
 			if (lastType!=0) { servicesHTML=servicesHTML+'</div>'; }
-			servicesHTML=servicesHTML+'<div class="placetype">'+serviceType+'</div><div class="placesdivider"></div>'; 
+			servicesHTML=servicesHTML+'<div class="placetype">'+serviceType;
+			serviceIcon='';
+			if (serviceType == "MUA") serviceIcon='<i class="fa-solid fa-paintbrush"></i>';
+			if (serviceType == "Stylist") serviceIcon='<i class="fa-solid fa-shirt"></i>';
+			servicesHTML=servicesHTML+serviceIcon+'</div><div class="placesdivider"></div>'; 
 		}
 		var serviceRecc;
 		if (service.servicerecommended=="1") {serviceRecc="block";} else serviceRecc="none";
@@ -1041,16 +1064,6 @@ document.getElementById("closebtn").addEventListener('click', function closeClic
 	document.getElementById('closebtn').style.opacity="0";
 	setTimeout(function() {	document.getElementById('fullscreencard').innerHTML="";	},500);
 });
-
-function addMapListener() {
-	document.getElementById("maplink").addEventListener('click', function mapClick(){
-		if 
-	 (/(iPad|iPhone|iPod)/g.test(navigator.userAgent))   { 
-			document.getElementById("maplink").outerHTML=document.getElementById("maplink").outerHTML.replace("https://","maps://");
-	 }
-
-	});
-}
 
 function hideSafety() {
 	const popup=document.getElementById("s_popup");
