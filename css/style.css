@@ -307,7 +307,7 @@ overflow-y: hidden;
 	display:none;
     padding-bottom:10vh;	
     width: 100vw;
-	height:95vh;
+	min-height:95vh;
     top: 0;
     background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
@@ -630,10 +630,14 @@ transform: translateY(0);
 
 .scrollstop {
 	overflow: hidden;
+	overflow-Y: hidden;
 	/* opacity:0; */
-	transition:all 0.2s;
-	max-height:100vh;
+	/* transition:all 0.2s; */
+	height:100vh;
+	overscroll-behavior: contain;
 	/* display:none; */
+	position:fixed;
+	top:0;
 }
 
 .vcenter {

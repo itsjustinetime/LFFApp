@@ -390,6 +390,9 @@ async function getData() {
 }
 
 function replaceMe(template, data) {
+    if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent))   {
+	                                                 template=template.replace('id="maplink" href="https', 'id="maplink" href="maps');
+                                                        }
 	template=template.replaceAll('imgsrc','src');
   const pattern = /{\s*(\w+?)\s*}/g; // {property}
   return template.replace(pattern, (_, token) => data[token] || '');
@@ -977,15 +980,13 @@ function getPlaceCollapsables() {
 	// the following function displays the explore fullscreen modal
 	venuecollapses.forEach(vencollapse => {vencollapse.addEventListener('click', function handleVenCollapse(event) {
 		scrollPosition=window.scrollY;
-		document.getElementById('appbody').classList.add('scrollstop'); 
+		setTimeout(function() {document.getElementById('appbody').classList.add('scrollstop');},350); 
 		var myId=this.id;
 		var fsId="fs"+myId;
 		const fsclone = document.getElementById(fsId).cloneNode(true);
-		
 		var fullscreen=document.getElementById("fullscreencard2");
-
 		fullscreen.appendChild(fsclone);
-				fullscreen.style.transform="translateY(100vh)";
+		fullscreen.style.transform="translateY(100vh)";
 		setTimeout(function() {fullscreen.style.transform="translateY(0vh)"; },2);
 		fullscreen.showPopover();
 		//fullscreen.style="display:block";
@@ -1002,7 +1003,7 @@ function destroyFullscreen() {
 	//return;
 	var fs = document.getElementById('fullscreencard2');
 	if (fs.innerHTML !='') {
-		
+	setTimeout(function() {window.scroll(0,scrollPosition);},20);
 	document.getElementById('appbody').classList.remove('scrollstop');
 	var thisId=document.getElementById('fullscreencard2');
 	thisId.style.transform="translateY(120vh) scale(0.5)";
@@ -1350,15 +1351,6 @@ function titleText() {
 	targetImg.style.height=fontSize*imgScale;
 	targetText.style.marginTop="-"+fontSize*.29+"px";
 	document.querySelector('.headerdate').style="right:"+dateInset+"vw";
-}
-
-function mapTranslate(id) {
-	maplink=document.getElementById(id);
-        if
-     (/(iPad|iPhone|iPod)/g.test(navigator.userAgent))   {
-            maplink.outerHTML=maplink.outerHTML.replace("https://","maps://");
-     }
- 
 }
 
 </script>
