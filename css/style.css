@@ -106,6 +106,7 @@
 	margin-right:2vw;
 	padding-left:4px;
 	padding-right:4px;
+	padding-bottom:1px;
 }
 
 .servicename {
@@ -228,6 +229,10 @@ body {
 	}
 }
 
+#appbody {
+	transition: all 0.5s;
+}
+
 .hide {
 	display:none;
 }
@@ -298,6 +303,16 @@ max-height:0px;
 overflow-y: hidden;	
 }
 
+#fullsc {
+	display:none;
+    padding-bottom:10vh;	
+    width: 100vw;
+	height:95vh;
+    top: 0;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
 .venuemodal {
 	display:none;
     padding-bottom:10vh;	
@@ -436,6 +451,36 @@ a {
 	transition: all 0.25s;
 }
 
+dialog {
+	margin:0!important;
+	padding:0;
+}
+
+[popover] {
+	
+ /*   position: fixed; */
+/* top:0;  */
+transform: translateY(0);
+ width: fit-content;
+    &:popover-open {
+    opacity: 1;
+    transform: none;
+	
+
+	}
+    inset: 0px;
+    margin: 0;
+    border-width: 0;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+ width:100vw;
+    overflow: auto;
+	height:100vh;
+	transition: all 0.35s ease-in-out;
+	
+}	
+	
 #fullscreencard {
 	display: none;
 	position: absolute;
@@ -585,10 +630,10 @@ a {
 
 .scrollstop {
 	overflow: hidden;
-	opacity:0;
+	/* opacity:0; */
 	transition:all 0.2s;
 	max-height:100vh;
-	display:none;
+	/* display:none; */
 }
 
 .vcenter {
@@ -1351,6 +1396,7 @@ overflow-x:scroll;
 	text-transform: uppercase;
 	overflow-x:scroll;
 	color: white;
+	padding:5px 0px;
 }
 
 .placesdivider:first-child {
@@ -1561,7 +1607,7 @@ overflow-x:scroll;
 }
 
 .venuecolltext {
-	padding:10vw;
+	padding:10vw 10vw 0 10vw;
 }
 
 .safespaceimg{
