@@ -84,7 +84,9 @@ if (isset($_COOKIE['lffID'])) {
 	 </div>
 	 <div class="page3 appcontent" id="page3">
 		<div class="loading l3" id="placeslist">The venues list is almost here...</div>
-		<div class="loading 14" id="serviceslist"></div>
+	 </div>
+	 	 <div class="page4 appcontent" id="page4">
+		<div class="loading l4" id="serviceslist">The services list is almost here...</div>
 	 </div>
  </div>
 </div>
@@ -98,7 +100,7 @@ if (isset($_COOKIE['lffID'])) {
 
 <?php echo file_get_contents('footer.php'); ?>
 </div> <!-- end of #appbody? -->
-<div id="fullscreencard"></div>
+<dialog id="fullscreencard2" popover=manual></dialog>
 <div id="fullscreensafety"></div>
 <div id="fadeout"></div>
 <div class="safetyp" id="safetyp">
@@ -187,6 +189,7 @@ var debugmode=0;
 if (!testMode) {  window.setTimeout(updateDate(),2); window.setInterval(updateDate,1000); }
 
 document.body.addEventListener("load", getData());
+
 window.setInterval(async () => { await getData()}, 60*60*1000);
 if (!testMode) { window.setInterval(updateEventList,10000); } else { window.setInterval(updateEventList,1000); }
 window.setInterval(updateOfferList, 10000);
@@ -487,7 +490,7 @@ function removeNow() {
 	var i=0;
 	for (  i=0; i < events.length; i++) {
 			var eventId=events[i].eventid;
-			var eventPlace=events[i]['eventvenue'].replace(" ", "_");
+			var eventPlace=events[i]['eventvenue'].replaceAll(" ", "_");
 			var htmlId=eventId+eventPlace;
 			var eventStartTimeString=events[i]['eventstart'];
 			var eventEndTimeString=events[i]['eventend'];
@@ -529,7 +532,7 @@ function updateNow() {
 		//var eventShowFrom=getSeconds(eventShowFrom);
 		//var eventShowUntil=getSeconds(eventShowUntil);
 		var eventId=events[i].eventid;
-		var eventPlace=events[i].eventvenue.replace(" ", "_");
+		var eventPlace=events[i].eventvenue.replaceAll(" ", "_");
 		var htmlId=eventId+eventPlace;
 		//if (curDate > eventStartTime + 3600) { break; }
 		if (curDate < eventStartTime) {
@@ -584,7 +587,7 @@ if (debugmode) { console.log("updateUpcoming"); }
 	 return;
 	}
 	var eventId=events[i]['eventid'];
-	var eventPlace=events[i].eventvenue.replace(" ", "_");
+	var eventPlace=events[i].eventvenue.replaceAll(" ", "_");
 	var eventtitle = events[i].eventtitle.replace(/LFF\ .*/,"LFF");
 	var venuename = events[i].eventvenue;
 	var eventDate = niceDateTime(events[i].eventstart); 
@@ -605,7 +608,7 @@ function updateEventList() {
 		var eventId=event.eventid;
 		//var eventPlace;
 		//if (event.eventvenue) { eventPlace=event.eventvenue.replace(" ", "_"); } else eventPlace=" ";
-		var eventID=eventId+event.eventvenue.replace(" ","_");
+		var eventID=eventId+event.eventvenue.replaceAll(" ","_");
 	
 		eventStartTime=getSeconds(eventStartTime);
 		eventEndTime=getSeconds(eventEndTime);
@@ -626,7 +629,7 @@ function updateOfferList() {
 		var offerStartDate=offer.highlightstart;
 		var offerEndDate=offer.highlightend;
 		var offerId=offer.highlightid;
-		var offerPlace=offer.highlightvenue.replace(" ", "_");
+		var offerPlace=offer.highlightvenue.replaceAll(" ", "_");
 		var offerID=offerId+offerPlace+"offer";
 		offerStartDate=getSeconds(offerStartDate);
 		offerEndDate=getSeconds(offerEndDate);
@@ -710,7 +713,7 @@ function updateEvents() {
 		if (event.eventfull == 'on' ) {event.eventdescription=""; }
 		
 		const data = {
-			 venuetag: event.eventid+event.eventvenue.replace(" ", "_"),
+			 venuetag: event.eventid+event.eventvenue.replaceAll(" ", "_"),
 			 eventstart: event.eventstart,
 			 eventend: event.eventend,
 			 eventstarttime: niceTime(event.eventstart),
@@ -763,7 +766,7 @@ function updateHighlights() {
 		var coords=offer.venuegps;
 		if (coords === "NULL" || coords==="") { coords=pAddress; }
 		const data = {
-					 venuetag: offer.highlightid+offer.highlightvenue.replace(" ", "_")+'offer',
+					 venuetag: offer.highlightid+offer.highlightvenue.replaceAll(" ", "_")+'offer',
 					 highlightstartdate: offer.highlightstart,
 					 highlightenddate: offer.highlightend,
 					 highlighttitle: offer.highlighttitle,
@@ -833,7 +836,7 @@ function updatePlaces() {
 		if (coords === "NULL" || coords==="") { coords=pAddress; }
 		const data = { 
 					 venuerecshow: venuerecShow,
-					 venuetag: place.venueid+place.venuename.replace(" ", "_")+'explore',
+					 venuetag: place.venueid+place.venuename.replaceAll(" ", "_")+'explore',
 					 venuename: place.venuename,
 					 venuedescription: place.venuedescription,
 					 venueimage: imagePath+place.venueimage,
@@ -904,7 +907,7 @@ function updateServices() {
 					 servicetel: service.servicetel,
 					 service_recc: service.servicerecommended,
 					 saddress_show: saddress_show,
-					 servicetag: service.service_id+service.servicename.replace(" ", "_")+'service',
+					 servicetag: service.service_id+service.servicename.replaceAll(" ", "_")+'service',
 					 service_name: service.servicename,
 					 service_desc: service.servicedescription,
 					 service_facebook: service.servicefacebook,
@@ -967,44 +970,55 @@ function getOfferCollapsables() {
 	});
 }
 
+
+
 function getPlaceCollapsables() { 
 	const venuecollapses = document.querySelectorAll('.venueexpand');
 	// the following function displays the explore fullscreen modal
 	venuecollapses.forEach(vencollapse => {vencollapse.addEventListener('click', function handleVenCollapse(event) {
-		//console.log("venuetap");
 		scrollPosition=window.scrollY;
 		document.getElementById('appbody').classList.add('scrollstop'); 
 		var myId=this.id;
 		var fsId="fs"+myId;
 		const fsclone = document.getElementById(fsId).cloneNode(true);
-		var fullscreen=document.getElementById("fullscreencard");
+		
+		var fullscreen=document.getElementById("fullscreencard2");
+
 		fullscreen.appendChild(fsclone);
-		fullscreen.style="diaplay:block";
+				fullscreen.style.transform="translateY(100vh)";
+		setTimeout(function() {fullscreen.style.transform="translateY(0vh)"; },2);
+		fullscreen.showPopover();
+		//fullscreen.style="display:block";
 		fullscreen.firstElementChild.id="fullsc";
-		fullscreen.style.transform="translateY(-100vh)";
-		document.getElementById("fullsc").style.display="block";
-		setTimeout(function() { fullscreen.style="display:block"; },2);	
-		setTimeout(function() {	fullscreen.style.transform="translateY(0)"; },20);
-		setTimeout(function() { window.scrollTo(0,0); }, 100); // Not sure we need this scrolling
+		fullscreen.firstElementChild.firstElementChild.nextElementSibling.firstElementChild.id="fsmaplink";
+		document.getElementById('fullsc').style.display="block";
+		fullscreen.firstElementChild.classList.remove('venuemodal');
+		event.preventDefault();
 		});
 	});
 }
 
 function destroyFullscreen() {
+	//return;
+	var fs = document.getElementById('fullscreencard2');
+	if (fs.innerHTML !='') {
+		
 	document.getElementById('appbody').classList.remove('scrollstop');
-	var thisId=document.getElementById('fullscreencard');
-	thisId.style.transform="translateY(200vh)";
-	thisId.style.height="0";
-	setTimeout(function() { thisId.innerHTML=""; },300);  // destroy the clone
-	setTimeout(function() { window.scroll(0,scrollPosition); },20);	 // Not sure we need this scrolling */
+	var thisId=document.getElementById('fullscreencard2');
+	thisId.style.transform="translateY(120vh) scale(0.5)";
+	setTimeout(function() {	thisId.hidePopover(); }, 400);
+	setTimeout(function() { thisId.innerHTML=""; },550);  // destroy the clone
+	}
 }
 
 const venuexpands = document.querySelectorAll('.venuecollapse'); 
 const scrollables = document.querySelectorAll('.placesdivider');
 
 // the following function hides the explore fullscreen modal & everything associated with that
-document.getElementById('fullscreencard').addEventListener('click', function hideFullscreen(event) {
+document.getElementById('fsclose').addEventListener('click', function hideFullscreen(event) {
+	console.log("fsclose");
 	destroyFullscreen();
+	event.preventDefault();
 });
 
 function checkVisibilityJ(e) {
@@ -1016,7 +1030,7 @@ function doPage(pageNo) {
     if (checkVisibilityJ(pages[0])) currentPage=0; 
     if (checkVisibilityJ(pages[1])) currentPage=1;
     if (checkVisibilityJ(pages[2])) currentPage=2;
-	// if (checkVisibilityJ(pages[3])) currentPage=3;
+    if (checkVisibilityJ(pages[3])) currentPage=3;
 	// if (checkVisibilityJ(pages[4])) currentPage=4;
 	hideSafety();
 
@@ -1080,6 +1094,7 @@ function hideSafety() {
 			if (checkVisibilityJ(pages[0])) pageNo=1; 
 			if (checkVisibilityJ(pages[1])) pageNo=2;
 			if (checkVisibilityJ(pages[2])) pageNo=3;
+			if (checkVisibilityJ(pages[3])) pageNo=4;
 			document.getElementById("page"+pageNo+"btn").classList.add("menuitemactive");
 		// disappear the popup
 		popup.style.transform="translateY(152%)";
@@ -1335,6 +1350,15 @@ function titleText() {
 	targetImg.style.height=fontSize*imgScale;
 	targetText.style.marginTop="-"+fontSize*.29+"px";
 	document.querySelector('.headerdate').style="right:"+dateInset+"vw";
+}
+
+function mapTranslate(id) {
+	maplink=document.getElementById(id);
+        if
+     (/(iPad|iPhone|iPod)/g.test(navigator.userAgent))   {
+            maplink.outerHTML=maplink.outerHTML.replace("https://","maps://");
+     }
+ 
 }
 
 </script>
