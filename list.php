@@ -21,7 +21,7 @@ if ($passcodeEnable==1) {
         foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
             $data = json_decode(file_get_contents($file));
 			$passcodevalue=$data->passcodevalue;
-			$passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
+			$passcodeexpires=str_replace(" "," ", $data->passcodeexpires);
 			if ($passcodevalue == $passcode && $passcodeexpires > $timeDate) { // passcode is good
 				break;
 			
@@ -227,8 +227,8 @@ function updateLFFTimer() {
 	var i=0;
 	for (  i=0; i < events.length; i++) {
 		const event=events[i];
-		var thisDate=event.eventstart.split("T")[0];
-		var thisTime=event.eventstart.split("T")[1];
+		var thisDate=event.eventstart.split(" ")[0];
+		var thisTime=event.eventstart.split(" ")[1];
 		var eventStartTime=event.eventstart;
 		var eventEndTime=event.eventend;
 		var eventShowFrom=event.eventshowfrom;
@@ -523,8 +523,8 @@ function updateNow() {
 	if (seconds<10) {seconds="0"+seconds;}
 	if (testMode) { document.getElementById("testdate").innerHTML=month+"-"+day+" "+hour+":"+minutes+":"+seconds; }
 	for (  i=0; i < events.length; i++) {
-		var thisDate=events[i].eventstart.split("T")[0];
-		var thisTime=events[i].eventstart.split("T")[1];
+		var thisDate=events[i].eventstart.split(" ")[0];
+		var thisTime=events[i].eventstart.split(" ")[1];
 		var eventStartTime=events[i].eventstart;
 		var eventStartTimeString=events[i].eventstart;
 		var eventEndTimeString=events[i].eventend;
@@ -576,8 +576,8 @@ if (debugmode) { console.log("updateUpcoming"); }
 	}
 	for (  i=0; i < events.length; i++) {
 		const event=events[i];
-		var thisDate=event.eventstart.split("T")[0];
-		var thisTime=event.eventstart.split("T")[1];
+		var thisDate=event.eventstart.split(" ")[0];
+		var thisTime=event.eventstart.split(" ")[1];
 		var eventStartTime=event.eventstart;
 		var eventEndTime=event.eventend;
 		var eventStartTime=getSeconds(eventStartTime);
@@ -689,7 +689,7 @@ function updateEvents() {
 	for ( var i=0; i < events.length; i++) {
 		const event=events[i];
 		var curTemplate=eventTemplate;
-		event.eventstart=event.eventstart.replace("T"," ");
+		event.eventstart=event.eventstart.replace(" "," ");
 		if ( event.eventend < dateTime) { continue; }
 		var thisDate=event.eventstart.split(" ")[0];
 		var thisTime=event.eventstart.split(" ")[1];
@@ -761,8 +761,8 @@ function updateHighlights() {
 	for (var i=0; i < offers.length; i++) {
 		var curTemplate=highlightTemplate;
 		const offer=offers[i];
-		var thisDate=offer.highlightstart.split("T")[0];
-		var offerEnds=offer.highlightend.split("T")[0];
+		var thisDate=offer.highlightstart.split(" ")[0];
+		var offerEnds=offer.highlightend.split(" ")[0];
 		var offerEndDateTime=new Date(offerEnds).getTime()/1000;
 		if (offerEndDateTime < curDate) { continue; }
 		var pAddress=offer.venueaddress;
