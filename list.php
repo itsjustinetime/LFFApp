@@ -196,8 +196,23 @@ window.setInterval(updateOfferList, 10000);
 window.setInterval(updateLFFTimer,1000);
 
 if (testMode) {
-	curDate=new Date("2024-12-07 03:59:45").getTime()/1000;
-	window.setInterval(function() { curDate=curDate+1; }, 1000);
+	curDate=new Date("2025-01-03 19:58:00").getTime()/1000;
+	window.setInterval(function() { curDate=curDate+10; }, 1000);
+	document.addEventListener(
+  "keydown",
+  (event) => {
+    const keyName = event.key;
+
+    if (keyName === "h") {
+      curDate=curDate+3600;
+      return;
+    }
+	if (keyName === "t") { curDate=curDate+600; return; }
+
+
+  },
+  false,
+);
 }
 
 eventTemplate=document.getElementById("eventtemp").innerHTML;
@@ -528,12 +543,10 @@ function updateNow() {
 		var eventStartTime=events[i].eventstart;
 		var eventStartTimeString=events[i].eventstart;
 		var eventEndTimeString=events[i].eventend;
-		//var eventShowFrom=events[i].eventshowfrom;
-		//var eventShowUntil=events[i].eventshowuntil;
+
 		var eventStartTime=getSeconds(eventStartTime);
 		var eventEndTime=getSeconds(eventEndTimeString);
-		//var eventShowFrom=getSeconds(eventShowFrom);
-		//var eventShowUntil=getSeconds(eventShowUntil);
+
 		var eventId=events[i].eventid;
 		var eventPlace=events[i].eventvenue.replaceAll(" ", "_");
 		var htmlId=eventId+eventPlace;
@@ -655,7 +668,6 @@ function removeOffer(item) {
 
 function removeItem(item) {
 	var parentEl = document.getElementById(item).parentElement;
-	
 	if (document.getElementById(item).parentElement.childElementCount < 3) {
 		item=document.getElementById(item).parentElement.id;
 		document.getElementById(item).nextElementSibling.remove();
@@ -664,8 +676,12 @@ function removeItem(item) {
 	document.getElementById(item).style.transform="translateX(105%)";
 	document.getElementById(item).style.maxHeight=heightPx+"px";
 	setTimeout(function() {document.getElementById(item).style.maxHeight="0px";},200);
-	setTimeout(function() {document.getElementById(item).remove(); },300);
-	if (parentEl.childElementCount < 2) setTimeout(function() {parentEl.remove(); },500);
+	spacer=document.getElementById(item).nextElementSibling;
+	spacer.remove();
+	itemRemove=document.getElementById(item);
+	itemParent=document.getElementById(item).parentElement;
+	if (itemRemove.parentElement.childElementCount < 3) { setTimeout(function() {itemParent.remove(); }, 500) };
+	setTimeout(function() {itemRemove.remove(); },300);
 }
 
 function isFirstFriday(date) {
