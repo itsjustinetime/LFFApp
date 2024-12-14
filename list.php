@@ -352,7 +352,7 @@ function dynamicSort(properties) {
 }
 
 async function getData() {
-	var response = await fetch('<?php echo $PATH_CONTENT.'/lff-events/json/lffeventdata.json'; ?>'); //+'?nocache='+new Date().getTime());
+	var response = await fetch('<?php echo $PATH_CONTENT.'/lff-events/json/lffeventdata.json?ver='.uniqid(); ?>');
 	response = await response.text();
     const jsonData = JSON.parse(response);
 	events=jsonData.events;
@@ -543,14 +543,12 @@ function updateNow() {
 		var eventStartTime=events[i].eventstart;
 		var eventStartTimeString=events[i].eventstart;
 		var eventEndTimeString=events[i].eventend;
-
 		var eventStartTime=getSeconds(eventStartTime);
 		var eventEndTime=getSeconds(eventEndTimeString);
-
 		var eventId=events[i].eventid;
 		var eventPlace=events[i].eventvenue.replaceAll(" ", "_");
 		var htmlId=eventId+eventPlace;
-		//if (curDate > eventStartTime + 3600) { break; }
+
 		if (curDate < eventStartTime) {
 			var eventId=events[i].eventid;
 			var timeDiff = eventStartTime - curDate;
@@ -962,13 +960,10 @@ function getEventCollapsables() {
 			tap4more=document.getElementById("t4m_"+this.id);
 			if (theElement.style.maxHeight) { 
 				theElement.style.maxHeight=null; 
-				//tap4more.style.maxHeight='20px'; 
 				} else {
 				const expanded=document.querySelectorAll('.collapse');
 				for (let i=0; i < expanded.length; i++) { expanded[i].style.maxHeight=null; }
 				theElement.style.maxHeight=theElement.scrollHeight + "px";
-				//tap4more.style.maxHeight='0';
-				//tap4more.style='display:none;';
 			}
 		});
 	});
@@ -1005,7 +1000,6 @@ function getPlaceCollapsables() {
 		fullscreen.style.transform="translateY(100vh)";
 		setTimeout(function() {fullscreen.style.transform="translateY(0vh)"; },2);
 		fullscreen.showPopover();
-		//fullscreen.style="display:block";
 		fullscreen.firstElementChild.id="fullsc";
 		fullscreen.firstElementChild.firstElementChild.nextElementSibling.firstElementChild.id="fsmaplink";
 		document.getElementById('fullsc').style.display="block";
@@ -1016,7 +1010,6 @@ function getPlaceCollapsables() {
 }
 
 function destroyFullscreen() {
-	//return;
 	var fs = document.getElementById('fullscreencard2');
 	if (fs.innerHTML !='') {
 	setTimeout(function() {window.scroll(0,scrollPosition);},20);
@@ -1144,7 +1137,6 @@ document.getElementById("safetypagebtn").addEventListener('click', function safe
 	setTimeout(function() { 
 							var scrollAmount = window.innerHeight-document.getElementById("s_popup").scrollHeight-document.getElementById("footmenu").scrollHeight;
 							popup.style.transform="translateY("+scrollAmount+"px)";
-							//popup.style.transform="translateY(40%)"; 
 							document.getElementById("fadeout").style.opacity="1";
 						  },50
 			   );
@@ -1282,29 +1274,6 @@ for (i = 0; i < coll3.length; i++) {
   });
 }
 };
-/*
-setTimeout(function() { 
-	document.getElementById("bigmapbutton").addEventListener('click', function intClick() {
-		document.getElementById("mapclose").style.display="block";
-			var bigmap=document.getElementById("bigmap");	
-			viewport = document.querySelector("meta[name=viewport]");
-			viewport.setAttribute('content', 'initial-scale=0.2, minimum-scale=0.1, maximum-scale=3.0, user-scalable=1');
-			//document.body.style.maxWidth="600%";
-			document.body.style.overflowX="scroll";
-			bigmap.style.display="block";
-	});
-	}
-,250);	
-
-document.getElementById("mapclose").addEventListener('click', function intClick() {
-	viewport = document.querySelector("meta[name=viewport]");
-	viewport.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no');
-	document.getElementById("bigmap").style.display="none";
-	document.getElementById("mapclose").style.display="none";
-});
-
-*/
-
 
 function titleText() {
 	var targetText = document.querySelector('.monthtext');
