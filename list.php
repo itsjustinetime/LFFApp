@@ -11,33 +11,31 @@ $improveMode=0;
 //Get today's date
 $timeDate = date("Y-m-d H:i:s");
 if ($passcodeEnable==1) {
-	if(isset($_COOKIE['lffkey'])){
-		$passcode = $_COOKIE['lffkey'];
-	} else $passcode = "BOOBOO";
-		
-		$passcode = stripslashes($passcode);
-		$passdata=[];
-		if (!empty(glob($PATH_CONTENT . '/lff-events/passcodes/*.json'))) {
-        foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
-            $data = json_decode(file_get_contents($file));
-			$passcodevalue=$data->passcodevalue;
-			$passcodeexpires=str_replace(" "," ", $data->passcodeexpires);
-			if ($passcodevalue == $passcode && $passcodeexpires > $timeDate) { // passcode is good
-				break;
-			
-			} else
-				if ($passcodevalue == $passcode && $passcodeexpires < $timedate) { // passcode expired
-					setcookie("lffkey", "", time() - 3600);
-					header("location: expired.php");
-				}
-			else { // passcode not recognised
-					header("location: index.php");
-			}
-		}
-		}
- //writeLog();
+	$loggedIn=0;
+        if(isset($_COOKIE['lffkey'])){
+                $passcode = $_COOKIE['lffkey'];
+        } else $passcode = "BOOBOO";
+        $passcode = stripslashes($passcode);
+        $passdata=[];
+        if (!empty(glob($PATH_CONTENT . '/lff-events/passcodes/*.json'))) {
+                foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
+                        $data = json_decode(file_get_contents($file));
+                        $passcodevalue=$data->passcodevalue;
+                        $passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
+                        if ($passcodevalue == $passcode) {
+                                if ($passcodeexpires > $timeDate) { // passcode is good
+                                        $loggedIn=1;
+										break;
+                                } else
+                                if ($passcodeexpires < $timedate) { // passcode expired
+                                        setcookie("lffkey", "", time() - 3600);
+                                        header("location: expired.php");
+                                }
+                        }
+                }
+                }
+ if (!$loggedIn) {header("location:index.php");  }
 }
-
 if (isset($_COOKIE['lffID'])) {
 	$lffID = $_COOKIE['lffID'];
 	$lffID = stripslashes($lffID);

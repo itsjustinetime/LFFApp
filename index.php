@@ -9,35 +9,45 @@ if((isset($_SESSION['lffkey']) && $_SESSION['lffkey'] ='') || ($passcodeEnable==
 header("location: list.php");
 }
 $timeDate = date("Y-m-d H:i:s");
+
+// read non-expired LFF passcodes into an array
+
+$lffCodes[]='';
+if (!empty(glob($PATH_CONTENT . '/lff-events/passcodes/*.json'))) {
+        foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
+            $data = json_decode(file_get_contents($file));
+                  $passcodevalue=$data->passcodevalue;
+                  $passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
+		if ($passcodeexpires < $timeDate) { $lffCodes[]=$passcodevalue; }
+	}
+}
+	
+
 // test for cookie being a valid lff passcode
-if(isset($_COOKIE['lffkey'])){ 
+if(isset($_COOKIE['lffkey'])){
     $passcode = $_COOKIE['lffkey'];
-    
+
     $passcode = stripslashes($passcode);
     if (!empty(glob($PATH_CONTENT . '/lff-events/passcodes/*.json'))) {
         foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
             $data = json_decode(file_get_contents($file));
-			$passcodevalue=$data->passcodevalue;
-			$passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
-
-			if ($passcodevalue == $passcode && $passcodeexpires > $timeDate) { // passcode is good
-				header("location: list.php"); // redirect em to the main page	
-				break;
-			} else
-				if ($passcodevalue == $passcode && $passcodeexpires < $timeDate) { // passcode expired
-					setcookie("lffkey", "", time() - 3600);
-					header("location: expired.php");
-				}
-			else { // passcode not recognised
-					//header("location: index.php");
-			}
-		}
-	}   
+            $passcodevalue=$data->passcodevalue;
+            $passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
+            if ($passcodevalue == $passcode) {
+                        if ( $passcodeexpires > $timeDate) { // passcode is good
+                                header("location: list.php"); // redirect em to the main page
+                                break;
+                        } else
+                                if ($passcodevalue == $passcode && $passcodeexpires < $timeDate) { // passcode expired
+                                        setcookie("lffkey", "", time() - 3600);
+                                        header("location: expired.php");
+                                }
+                }
+        }
+	
 }
-
-else{
-    // Cookie is not set
-}
+	header("location:logout.php"); // redirect to logout to delete their cookie
+} // end of if lffkey cookie is set
 
 ?>
 <!DOCTYPE html>

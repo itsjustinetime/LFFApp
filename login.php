@@ -13,7 +13,6 @@ if (isset($_POST['submit'])) {
 }
 
 if ($passcodeEnable) {
-	
 		$passcode = stripslashes($passcode);
 		$passdata=[];
 		if (!empty(glob($PATH_CONTENT . 'lff-events/passcodes/*.json'))) {
@@ -24,18 +23,17 @@ if ($passcodeEnable) {
 				if ($passcodevalue == $passcode && $passcodeexpires > $timeDate) { // passcode is good
 					setcookie("lffkey", $passcode, time()+ $maxCookieAge); // set the user's cookie so they stay logged in
 					setcookie("lffID",uniqid(), time() + $maxCookieAge); // set a unique ID in a cookie
-					header("location: list.php"); // redirect em to the main page	
+					$loggedIn=1;
+					header("location: list.php"); // redirect em to the main page
 					break;
 				} else
 					if ($passcodevalue == $passcode && $passcodeexpires < $timeDate) { // passcode expired
 						setcookie("lffkey", "", time() - 3600);
 						header("location: expired.php");
 					}
-				else { // passcode not recognised
-						header("location: index.php");
-					}
 			}
 		}
+		if (!$loggedIn) {header("location:index.php"); }
 
 } else { header("location:list.php"); }
 
