@@ -15,12 +15,14 @@ if ($passcodeEnable==1) {
                 $passcode = $_COOKIE['lffkey'];
         } else $passcode = "BOOBOO";
         $passcode = stripslashes($passcode);
-        $passCodes = getPasscodes();
+        $passCodes = getPasscodesExpiry();
 		foreach ($passCodes as $pass) {
-			if ($pass == $passcode) { $loggedIn=1; break; }
+			if ($pass->passcodevalue == $passcode) {
+				if ($pass->passcodeexpires > $timeDate) {	$loggedIn=1; break; } else { header("location:expired.php"); exit;}
+			}
 		}
 		
- if (!$loggedIn) {header("location:index.php");  }
+ if (!$loggedIn) {header("location:index.php"); exit; }
 }
 if (isset($_COOKIE['lffID'])) {
 	$lffID = $_COOKIE['lffID'];

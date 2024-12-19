@@ -4,22 +4,22 @@ include_once 'functions/functions.php';
 //include_once 'logging.php';
 //session_start();
 
-if((isset($_SESSION['lffkey']) && $_SESSION['lffkey'] ='') || ($passcodeEnable==0)){
-
-header("location: list.php");
-}
+if((isset($_SESSION['lffkey']) && $_SESSION['lffkey'] ='') || ($passcodeEnable==0)){ header("location: list.php"); }
 $timeDate = date("Y-m-d H:i:s");
 $loggedIn=0;
+$expired=0;
 // test for cookie being a valid lff passcode
 if(isset($_COOKIE['lffkey'])){
     $passcode = $_COOKIE['lffkey'];
     $passcode = stripslashes($passcode);
-	$passCodes = getPasscodes();
+	$passCodes = getPasscodesExpiry();
 		foreach ($passCodes as $pass) {
-			if ($pass == $passcode) {  $loggedIn=1; }
+			if ($pass->passcodevalue == $passcode) {
+				if ( $pass->passcodeexpires > $timeDate) {  $loggedIn=1; break; } else { $expired=1; break; }
+			}
 		}
-		
-	if ($loggedIn == 1) {header("location:list.php");} else	header("location:logout.php"); // redirect to logout to delete their cookie
+	if ($expired) { header("location:expired.php"); exit;}	
+	if ($loggedIn == 1) { header("location:list.php"); exit; } else { header("location:logout.php"); exit; }// redirect to logout to delete their cookie
 } // end of if lffkey cookie is set
 	
 ?>
