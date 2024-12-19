@@ -1,7 +1,7 @@
 <?php
 include_once 'configuration.php';
 //error_log( "path:".$PATH_CONTENT);
-
+include_once 'functions/functions.php';
 include_once 'logging.php';
 
 $passcodepath = '';
@@ -16,24 +16,11 @@ if ($passcodeEnable==1) {
                 $passcode = $_COOKIE['lffkey'];
         } else $passcode = "BOOBOO";
         $passcode = stripslashes($passcode);
-        $passdata=[];
-        if (!empty(glob($PATH_CONTENT . '/lff-events/passcodes/*.json'))) {
-                foreach (glob($PATH_CONTENT . '/lff-events/passcodes/*.json') as $key => $file) {
-                        $data = json_decode(file_get_contents($file));
-                        $passcodevalue=$data->passcodevalue;
-                        $passcodeexpires=str_replace("T"," ", $data->passcodeexpires);
-                        if ($passcodevalue == $passcode) {
-                                if ($passcodeexpires > $timeDate) { // passcode is good
-                                        $loggedIn=1;
-										break;
-                                } else
-                                if ($passcodeexpires < $timedate) { // passcode expired
-                                        setcookie("lffkey", "", time() - 3600);
-                                        header("location: expired.php");
-                                }
-                        }
-                }
-                }
+        $passCodes = getPasscodes();
+		foreach ($passCodes as $pass) {
+			if ($pass == $passcode) { $loggedIn=1; break; }
+		}
+		
  if (!$loggedIn) {header("location:index.php");  }
 }
 if (isset($_COOKIE['lffID'])) {
