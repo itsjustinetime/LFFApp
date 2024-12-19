@@ -5,7 +5,6 @@ include_once 'functions/functions.php';
 include_once 'logging.php';
 
 $passcodepath = '';
-//$datapath='lffdata.json';
 
 $improveMode=0;
 //Get today's date
