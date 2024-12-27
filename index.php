@@ -3,6 +3,9 @@ include_once 'configuration.php';
 include_once 'functions/functions.php';
 //include_once 'logging.php';
 //session_start();
+function logWrongPasscode($code) {
+	file_put_contents('logs/wrongcodes.txt', "incorrect:".$code."\n", FILE_APPEND);
+}
 
 if((isset($_SESSION['lffkey']) && $_SESSION['lffkey'] ='') || ($passcodeEnable==0)){ header("location: list.php"); }
 $timeDate = date("Y-m-d H:i:s");
@@ -19,9 +22,39 @@ if(isset($_COOKIE['lffkey'])){
 			}
 		}
 	if ($expired) { header("location:expired.php"); exit;}	
-	if ($loggedIn == 1) { header("location:list.php"); exit; } else { header("location:logout.php"); exit; }// redirect to logout to delete their cookie
+	//if ($loggedIn == 1) { header("location:list.php"); exit; } else { header("location:logout.php"); exit; }// redirect to logout to delete their cookie
+	if ($loggedIn) { include_once 'app.php'; }
 } // end of if lffkey cookie is set
-	
+
+if (!$loggedIn) {	
+
+
+$error=''; // Variable To Store Error Message
+if (isset($_POST['submit'])) {
+								if (empty($_POST['passcode'])){
+																$error = "Passcode is not valid. Sorry.";
+															  }
+								else { $passcode=strtoupper($_POST['passcode']); $passcode=preg_replace( '/[\W]/', '', $passcode);}
+}
+
+if ($passcodeEnable) {
+		$passcode = stripslashes($passcode);
+		$passCodes = getPasscodesExpiry();
+		foreach($passCodes as $pass) {
+			if ($pass->passcodevalue == $passcode) {
+				if ($pass->passcodeexpires > $timeDate) {
+										setcookie("lffkey", $passcode, time()+ $maxCookieAge); // set the user's cookie so they stay logged in
+										setcookie("lffID",uniqid(), time() + $maxCookieAge); // set a unique ID in a cookie
+										header("location: ".$baseURL); exit; // redirect em to the main page
+										$loggedIn=1;
+										break;
+				} else { $expired=1; break; }
+							
+			}	
+		}
+		if ($expired==1) { header("location:expired.php"); exit;}
+		if (!$loggedIn && $passcode) {$error="That passcode was incorrect."; logWrongPasscode($passcode);}
+} 
 ?>
 <!DOCTYPE html>
 <html>
@@ -46,7 +79,7 @@ if(isset($_COOKIE['lffkey'])){
 			<div class="vcenter">
 				<div class="loginlogo"><img src="images/lff_logo_2023.png" class="loginlogoimg"></div>
 				<div class="account-wall">
-					<form class="form-signin" action="login.php" method="post">
+					<form class="form-signin" action="index.php" method="post">
 						<p class="logintext">Enter passcode</p>
 						<input type="text" name="passcode" class="form-control" placeholder="PASSCODE" required autofocus>
 						<button class="loginbtn" name="submit" type="submit">Continue</button>
@@ -57,7 +90,10 @@ if(isset($_COOKIE['lffkey'])){
 				</div>
 			</div>
 		</div> <!-- /container -->
-
+		<div id="errorModal" class="modal-body" style="display:none; position:fixed; top: 35vh; left:10vw; width:80vw; height:30vh; background:white; border:5px solid red; border-radius:15px; text-align:center;">
+			<div class="loginbtn">Oh Dear</div>
+			<p class="logintext"><?php echo $error; ?></p>
+		</div>
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<!-- Placed at the end of the document so the pages load faster -->
@@ -66,11 +102,10 @@ if(isset($_COOKIE['lffkey'])){
 		<!-- Fire error modal -->
 		<script>
 			document.getElementById('errorModal').style.display="block";
-        	document.getElementById('modalclosebtn').addEventListener("click", (function(){
 			setTimeout(function() {
 									document.getElementById('errorModal').style.display="none";
-								  },500);
-			}));
+								  },2000);
+		
 		</script>
 	<?php } ?>
 	
@@ -78,3 +113,4 @@ if(isset($_COOKIE['lffkey'])){
 
 	</body>
 </html>
+<?php } ?>
