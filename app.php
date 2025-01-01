@@ -37,34 +37,39 @@ function catToIcon($cat) {
 		case ("Featured"):
 		$icon='<i class="fa solid fa-award"></i>';
 		break;
-	
 }
+
 return $icon;
 }
+
 
 $improveMode=0;
 //Get today's date
 $timeDate = date("Y-m-d H:i:s");
+/*
 if ($passcodeEnable==1) {
 	$loggedIn=0;
-        if(isset($_COOKIE['lffkey'])){
-                $passcode = $_COOKIE['lffkey'];
-        } else $passcode = "BOOBOO";
+        if(isset($_COOKIE['lffkey'])){ $passcode = $_COOKIE['lffkey']; } else $passcode = "BOOBOO";
         $passcode = stripslashes($passcode);
         $passCodes = getPasscodesExpiry();
 		foreach ($passCodes as $pass) {
 			if ($pass->passcodevalue == $passcode) {
-				if ($pass->passcodeexpires > $timeDate) {	$loggedIn=1; break; } else { header("location:expired.php"); exit;}
+				if ($pass->passcodeexpires > $timeDate) { $loggedIn=1; break; } else { header("location:expired.php"); exit;}
 			}
 		}
 		
  if (!$loggedIn) {header("location:index.php"); exit; }
 }
+
+$uniq=uniqid();
+
 if (isset($_COOKIE['lffID'])) {
 	$lffID = $_COOKIE['lffID'];
 	$lffID = stripslashes($lffID);
+	$uniq=$lffID;
 	writeLog();
-}  else { setcookie("lffID",uniqid(), time() + $maxCookieAge); }
+}  else { setcookie("lffID",$uniq, time() + $maxCookieAge); }
+*/
 ?>
 
 <html>
@@ -76,15 +81,21 @@ if (isset($_COOKIE['lffID'])) {
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="max-age=0" />
-
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-title" content="LFFApp">
+<link rel="apple-touch-icon" href="icons/icon-512.png">
 <?php include_once('favicons.php'); ?>
 <title>Leeds First Friday</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
 <link href="css/style.css?random=<?php echo uniqid(); ?>" rel="stylesheet">
 <link href="css/safetystyle.css" rel="stylesheet">
 <script type="text/javascript" src="js/qrcode.min.js"></script>
+<link rel="manifest" href="lffpwa.webmanifest" />
 </head>
 <body>
+<div id="passcode" style="display:none"><?php echo $passcode; ?></div>
+<div id="uniq" style="display:none"><?php echo $uniq; ?></div>
 <div id="appbody" class="mainbodyclass">
 
 <div class="nextlff"><?php ?></div>
@@ -201,6 +212,9 @@ var minutes=theDate.getMinutes();
 var month=theDate.getMonth()+1;
 var year=theDate.getFullYear();
 var days=theDate.getDate();
+if (days < 10) {days="0"+days;}
+if (month < 10) {month="0"+month;}
+
 var dateTime=year+"-"+month+"-"+days+" "+hours+":"+minutes+":00";
 var lastEvent=0;
 var data;
@@ -738,7 +752,8 @@ function updateEvents() {
 		const event=events[i];
 		var curTemplate=eventTemplate;
 		event.eventstart=event.eventstart.replace(" "," ");
-		if ( event.eventend < dateTime) { continue; }
+		event.eventend=event.eventend.replace(" ", " ");
+		if ( event.eventend < dateTime) { console.log("skipping over event"); continue; }
 		var thisDate=event.eventstart.split(" ")[0];
 		var thisTime=event.eventstart.split(" ")[1];
 		var thisMonth = new Date (thisDate).getMonth();
