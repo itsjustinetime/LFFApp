@@ -207,15 +207,8 @@ var faClock='<i class="fa-regular fa-clock"></i> ';
 var imagePath='<?php echo $PATH_CONTENT; ?>/lff-events/images/';
 var eventhtml="";
 var theDate=new Date();
-var hours=theDate.getHours();
-var minutes=theDate.getMinutes();
-var month=theDate.getMonth()+1;
-var year=theDate.getFullYear();
-var days=theDate.getDate();
-if (days < 10) {days="0"+days;}
-if (month < 10) {month="0"+month;}
+var dateTime=theDate.toISOString().replace("T"," ").split(".")[0];
 
-var dateTime=year+"-"+month+"-"+days+" "+hours+":"+minutes+":00";
 var lastEvent=0;
 var data;
 var events;
