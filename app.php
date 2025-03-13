@@ -46,7 +46,7 @@ return $icon;
 $improveMode=0;
 //Get today's date
 $timeDate = date("Y-m-d H:i:s");
-/*
+
 if ($passcodeEnable==1) {
 	$loggedIn=0;
         if(isset($_COOKIE['lffkey'])){ $passcode = $_COOKIE['lffkey']; } else $passcode = "BOOBOO";
@@ -69,7 +69,7 @@ if (isset($_COOKIE['lffID'])) {
 	$uniq=$lffID;
 	writeLog();
 }  else { setcookie("lffID",$uniq, time() + $maxCookieAge); }
-*/
+
 ?>
 
 <html>
@@ -169,6 +169,20 @@ echo $venuecats;
 <div id="highlightcategories" style="display:none;"><?php echo $lffSettings['highlightcategories']; ?>
 </div>
 
+<div id="lffcard" style="display:none; height:100vh; width:100vw; position:fixed; top:0; background-image: url('images/IDGrad.webp'); background-size:cover; opacity:0; transition: all 200ms;">
+	<div id="badge" style="width:90vw; top:25vh; left:5vw; position:absolute;">
+		<img style="width:90vw;" src="images/lfflogowhite.webp" />
+	</div>
+	<div id="badge1" style="width:90vw; top:25vh; left:5vw; position:absolute; opacity:0.75">
+		<img style="width:90vw;" src="images/lffcircle.webp" />
+	</div>
+		<div id="badge2" style="width:100vw; top:22.5vh; left:0vw; position:absolute; opacity:1">
+		<img style="width:100vw; opacity: .15; scale: 1.5;" src="images/lffcircle.webp" />
+	</div>
+		<div class="pagedesc" style="text-align:center; padding:0;" id="idclock"></div>
+	
+</div>
+
 <script>
 
 function shuffle(array) {
@@ -223,6 +237,8 @@ var coffees;
 
 var venuecategories;
 var highlightcategories;
+var activepage=0;
+var badgeActive=0;
 
 var baseDir='/'+window.location.pathname.split("/");
 var testMode=0;
@@ -307,23 +323,41 @@ function updateSafety() {
 	document.getElementById('safetyp').innerHTML=safety;
 }
 
-function updateHashtag() {
-	//return;
-	var futureTime=60*60*24*2 + (60*60*12); // 2 days + 12 hours
-	var i=0;
-	found=[];
-	for (i=0; i<listing.length; i++) {
-		if (listing[i].eventtitle.includes("LFF")) { 
-		found.push([listing[i].eventtitle,listing[i].eventstart]);
-		}
-	}
 
-	for (i=0; i<found.length; i++) {
-		if (getSeconds(found[i][1])+(futureTime) >= curDate) {break;}
+function getFF() {
+    var d = new Date();
+    d.setDate(1);
+    // Get the first Friday in the month
+    while (d.getDay() !== 5) {
+        d.setDate(d.getDate() + 1);
+    }
+	return d;
+}
+
+function getNextLFF() {
+	var d = new Date();
+	d.setDate(1);
+	d.setMonth(d.getMonth()+1);
+	while (d.getDay() !== 5) {
+		d.setDate(d.getDate() +1);
 	}
-	theString=found[i][0].split(":")[0].replace(" LFF","");
-	document.getElementById("hashtag").innerHTML=theString;
-	document.querySelector('.headerdate').innerText=getTitleDate(found[i][1]);
+	return d;
+}
+
+function updateHashtag() {
+	var lffMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	myDate=new Date();
+	month = myDate.getMonth();
+	lffDate=getFF();
+	lffMonth=lffDate.getMonth();
+	lffYear=lffDate.getFullYear();
+	if (getFF() <= myDate) {  
+		month=getFF().getMonth()+1;
+		lffDate=getNextLFF();
+		if (month > 11) {month=0;}
+	}
+	document.getElementById("hashtag").innerHTML=lffMonths[month];
+	document.querySelector('.headerdate').innerText=getTitleDate(lffDate);
 	titleText();
 }
 
@@ -746,7 +780,7 @@ function updateEvents() {
 		var curTemplate=eventTemplate;
 		event.eventstart=event.eventstart.replace(" "," ");
 		event.eventend=event.eventend.replace(" ", " ");
-		if ( event.eventend < dateTime) { console.log("skipping over event"); continue; }
+		if ( event.eventend < dateTime) { continue; }
 		var thisDate=event.eventstart.split(" ")[0];
 		var thisTime=event.eventstart.split(" ")[1];
 		var thisMonth = new Date (thisDate).getMonth();
@@ -1081,12 +1115,14 @@ function checkVisibilityJ(e) {
 }
 
 function doPage(pageNo) {
+
 	const pages = document.querySelectorAll('.appcontent');	
     if (checkVisibilityJ(pages[0])) currentPage=0; 
     if (checkVisibilityJ(pages[1])) currentPage=1;
     if (checkVisibilityJ(pages[2])) currentPage=2;
     if (checkVisibilityJ(pages[3])) currentPage=3;
 	// if (checkVisibilityJ(pages[4])) currentPage=4;
+	hideBadge();
 	hideSafety();
 		if (pageNo == 2) { document.getElementById('explorebuttons').style.display='block'; } else document.getElementById('explorebuttons').style.display='none';
 
@@ -1114,11 +1150,12 @@ const buttons = document.querySelectorAll('.menubutton');
 
 buttons.forEach(button => { 
 							button.addEventListener('click', function handleButton(event) {
+																							
 																							destroyFullscreen();
 																							id=this.id;
 																							id=id.replace('btn','');
 																							id=id.replace('page','')-1;
-																							doPage(id);
+																						    doPage(id);
 																							}
 													);
 });
@@ -1171,7 +1208,7 @@ document.getElementById("safetypagebtn").addEventListener('click', function safe
 				hideSafety();
 				return;
 	}
-
+     hideBadge();
 	document.getElementById('appbody').style.top = `-${window.scrollY}px`;
 	document.getElementById('appbody').style.position = 'fixed';
     destroyFullscreen();
@@ -1437,6 +1474,58 @@ for (var i = 0; i < btns.length; i++) {
     this.className += " active";
   });
 }
+
+function hideBadge() {
+	setTimeout(function() { document.getElementById('lffcard').style.display="none"; },50);
+	document.getElementById('lffcard').style.opacity=0;
+	document.getElementById("lffid").classList.remove("menuitemactive");
+	document.getElementById('badge1').classList.remove("badgespin1");
+	document.getElementById('badge2').classList.remove("badgespin2");
+	var btnId="page"+(activepage+1)+"btn";
+	document.getElementById(btnId).classList.add("menuitemactive");
+	badgeActive=0;
+}
+
+function showBadge() {
+	hideSafety(); // get rid of the safety popup if it's up
+	var theDate=new Date(curDate*1000);
+	idDate=theDate.getHours() + ":" + theDate.getMinutes()+" " + niceDate(theDate,0,1) + " " + theDate.getFullYear();
+	document.getElementById('lffcard').style.display="block";
+	setTimeout(function() { document.getElementById('lffcard').style.opacity=1; },20);
+	setTimeout(function() { 
+							document.getElementById('badge1').classList.add("badgespin1");
+							document.getElementById('badge2').classList.add("badgespin2");
+							document.getElementById('idclock').innerText=idDate;
+							},200);
+						
+	var btns = document.getElementsByClassName("menuitem");
+	for (let i=0; i < btns.length; i++) { if (btns[i].classList.contains('menuitemactive')) { activepage=i; }; btns[i].classList.remove("menuitemactive"); }
+	document.getElementById("lffid").classList.add("menuitemactive");
+	badgeActive=1;	
+}
+
+
+
+function toggleBadge() {
+	var card=document.getElementById('lffcard');
+	if (card.style.display === "none") { showBadge(); } else { hideBadge(); } 
+}
+
+document.getElementById('lffid').addEventListener('click', function showBadge(event) {
+
+toggleBadge();
+	
+});
+
+function jtDate(theDate) {
+	var jtd = new Date(theDate);
+	var yyyy = jtd.getFullYear();
+	var monthN = jtd.getMonth();
+	var dayN = jtd.getDay();
+	
+	
+}
+
 </script>
 
 </body>
