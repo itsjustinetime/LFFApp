@@ -1424,9 +1424,20 @@ function titleText() {
 
 function filterVenues(c) {
 	
-	const transition = document.startViewTransition(() => {
+	  if (!document.startViewTransition) {
+    var x, i;
+  x = document.getElementsByClassName("filterDiv");
+  if (c == "all") c = "";
+  // Add the "show" class (display:block) to the filtered elements, and remove the "show" class from the elements that are not selected
+  for (i = 0; i < x.length; i++) {
+    w3RemoveClass(x[i], "placesshow");
+    if (x[i].className.indexOf(c) > -1) w3AddClass(x[i], "placesshow");
+  }
+    return;
+  }
+  
+	var transition = document.startViewTransition(() => {
   /* Take screenshot of an outgoing state */
-
 
   var x, i;
   x = document.getElementsByClassName("filterDiv");
